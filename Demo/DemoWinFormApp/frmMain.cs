@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Windows.Forms;
 using System.Reflection;
-using QLicense;
+using System.Windows.Forms;
 using DemoLicense;
+using QLicense;
 
 namespace DemoWinFormApp
 {
     public partial class frmMain : Form
     {
+        private byte[] _certPubicKeyData;
 
-        byte[] _certPubicKeyData;
         public frmMain()
         {
             InitializeComponent();
@@ -21,12 +21,12 @@ namespace DemoWinFormApp
         {
             //Initialize variables with default values
             MyLicense _lic = null;
-            string _msg = string.Empty;
-            LicenseStatus _status = LicenseStatus.UNDEFINED;
+            var _msg = string.Empty;
+            var _status = LicenseStatus.Undefined;
 
             //Read public key from assembly
-            Assembly _assembly = Assembly.GetExecutingAssembly();
-            using (MemoryStream _mem = new MemoryStream())
+            var _assembly = Assembly.GetExecutingAssembly();
+            using (var _mem = new MemoryStream())
             {
                 _assembly.GetManifestResourceStream("DemoWinFormApp.LicenseVerify.cer").CopyTo(_mem);
 
@@ -36,7 +36,7 @@ namespace DemoWinFormApp
             //Check if the XML license file exists
             if (File.Exists("license.lic"))
             {
-                _lic = (MyLicense)LicenseHandler.ParseLicenseFromBASE64String(
+                _lic = (MyLicense) LicenseHandler.ParseLicenseFromBase64String(
                     typeof(MyLicense),
                     File.ReadAllText("license.lic"),
                     _certPubicKeyData,
@@ -45,13 +45,13 @@ namespace DemoWinFormApp
             }
             else
             {
-                _status = LicenseStatus.INVALID;
+                _status = LicenseStatus.Invalid;
                 _msg = "Your copy of this application is not activated";
             }
 
             switch (_status)
             {
-                case LicenseStatus.VALID:
+                case LicenseStatus.Valid:
 
                     //TODO: If license is valid, you can do extra checking here
                     //TODO: E.g., check license expiry date if you have added expiry date property to your license entity
@@ -67,7 +67,7 @@ namespace DemoWinFormApp
                     //and also popup the activation form for user to activate your application
                     MessageBox.Show(_msg, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                    using (frmActivation frm = new frmActivation())
+                    using (var frm = new frmActivation())
                     {
                         frm.CertificatePublicKeyData = _certPubicKeyData;
                         frm.ShowDialog();
@@ -78,6 +78,7 @@ namespace DemoWinFormApp
 
                         Application.Exit();
                     }
+
                     break;
             }
         }

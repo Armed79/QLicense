@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BASE36.cs" />
+    <Compile Include="Base36.cs" />
     <Compile Include="HardwareInfo.cs" />
     <Compile Include="LicenseEntity.cs" />
     <Compile Include="LicenseHandler.cs" />

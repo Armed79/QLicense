@@ -5,9 +5,9 @@ using System.Xml.Serialization;
 namespace QLicense
 {
     /// <summary>
-    /// This attribute defines whether the property of LicenseEntity object will be shown in LicenseInfoControl
+    ///     This attribute defines whether the property of LicenseEntity object will be shown in LicenseInfoControl
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class ShowInLicenseInfoAttribute : Attribute
     {
         public enum FormatType
@@ -15,61 +15,46 @@ namespace QLicense
             String,
             Date,
             DateTime,
-            EnumDescription,
+            EnumDescription
         }
 
-        protected bool _showInLicenseInfo = true;
-        protected string _displayAs = string.Empty;
-        protected FormatType _formatType = FormatType.String;
+        protected string displayAs = string.Empty;
+        protected FormatType formatType = FormatType.String;
+
+        protected bool showInLicenseInfo = true;
 
         public ShowInLicenseInfoAttribute()
         {
         }
 
         public ShowInLicenseInfoAttribute(bool showInLicenseInfo)
-        {            
+        {
             if (showInLicenseInfo)
             {
                 throw new Exception("When ShowInLicenseInfo is True, DisplayAs MUST have a value");
             }
-            _showInLicenseInfo = showInLicenseInfo;
+
+            this.showInLicenseInfo = showInLicenseInfo;
         }
 
         public ShowInLicenseInfoAttribute(bool showInLicenseInfo, string displayAs)
         {
-            _showInLicenseInfo = showInLicenseInfo;
-            _displayAs = displayAs;
+            this.showInLicenseInfo = showInLicenseInfo;
+            this.displayAs = displayAs;
         }
+
         public ShowInLicenseInfoAttribute(bool showInLicenseInfo, string displayAs, FormatType dataFormatType)
         {
-            _showInLicenseInfo = showInLicenseInfo;
-            _displayAs = displayAs;
-            _formatType = dataFormatType;
+            this.showInLicenseInfo = showInLicenseInfo;
+            this.displayAs = displayAs;
+            formatType = dataFormatType;
         }
 
-        public bool ShowInLicenseInfo
-        {
-            get
-            {
-                return _showInLicenseInfo;
-            }
-        }
+        public bool ShowInLicenseInfo => showInLicenseInfo;
 
-        public string DisplayAs
-        {
-            get
-            {
-                return _displayAs;
-            }
-        }
+        public string DisplayAs => displayAs;
 
-        public FormatType DataFormatType
-        {
-            get
-            {
-                return _formatType;
-            }
-        }
+        public FormatType DataFormatType => formatType;
     }
 
 
@@ -96,11 +81,10 @@ namespace QLicense
         public DateTime CreateDateTime { get; set; }
 
         /// <summary>
-        /// For child class to do extra validation for those extended properties
+        ///     For child class to do extra validation for those extended properties
         /// </summary>
         /// <param name="validationMsg"></param>
         /// <returns></returns>
         public abstract LicenseStatus DoExtraValidation(out string validationMsg);
-
     }
 }

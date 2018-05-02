@@ -1,17 +1,18 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.IO;
-using System.Security;
 using System.Reflection;
-using QLicense;
+using System.Security;
+using System.Windows.Forms;
 using DemoLicense;
+using QLicense;
+using QLicense.Windows.Controls;
 
 namespace DemoActivationTool
 {
     public partial class frmMain : Form
     {
         private byte[] _certPubicKeyData;
-        private SecureString _certPwd = new SecureString();
+        private readonly SecureString _certPwd = new SecureString();
 
         public frmMain()
         {
@@ -26,8 +27,8 @@ namespace DemoActivationTool
         private void frmMain_Load(object sender, EventArgs e)
         {
             //Read public key from assembly
-            Assembly _assembly = Assembly.GetExecutingAssembly();
-            using (MemoryStream _mem = new MemoryStream())
+            var _assembly = Assembly.GetExecutingAssembly();
+            using (var _mem = new MemoryStream())
             {
                 _assembly.GetManifestResourceStream("DemoActivationTool.LicenseSign.pfx").CopyTo(_mem);
 
@@ -39,10 +40,10 @@ namespace DemoActivationTool
             licSettings.CertificatePassword = _certPwd;
 
             //Initialize a new license object
-            licSettings.License = new MyLicense(); 
+            licSettings.License = new MyLicense();
         }
 
-        private void licSettings_OnLicenseGenerated(object sender, QLicense.Windows.Controls.LicenseGeneratedEventArgs e)
+        private void licSettings_OnLicenseGenerated(object sender, LicenseGeneratedEventArgs e)
         {
             //Event raised when license string is generated. Just show it in the text box
             licString.LicenseString = e.LicenseBASE64String;
@@ -53,11 +54,10 @@ namespace DemoActivationTool
         {
             //Event raised when "Generate License" button is clicked. 
             //Call the core library to generate the license
-            licString.LicenseString = LicenseHandler.GenerateLicenseBASE64String(
+            licString.LicenseString = LicenseHandler.GenerateLicenseBase64String(
                 new MyLicense(),
                 _certPubicKeyData,
                 _certPwd);
         }
-
     }
 }

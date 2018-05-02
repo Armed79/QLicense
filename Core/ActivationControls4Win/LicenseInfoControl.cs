@@ -1,21 +1,20 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
-using System.Reflection;
-using System.ComponentModel;
 
 namespace QLicense.Windows.Controls
 {
     public partial class LicenseInfoControl : UserControl
     {
-        public string DateFormat { get; set; }
-
-        public string DateTimeFormat { get; set; }
-
         public LicenseInfoControl()
         {
             InitializeComponent();
         }
+
+        public string DateFormat { get; set; }
+
+        public string DateTimeFormat { get; set; }
 
         public void ShowTextOnly(string text)
         {
@@ -32,18 +31,19 @@ namespace QLicense.Windows.Controls
         {
             try
             {
-                StringBuilder _sb = new StringBuilder(512);
+                var _sb = new StringBuilder(512);
 
-                Type _typeLic = license.GetType();
-                PropertyInfo[] _props = _typeLic.GetProperties();
+                var _typeLic = license.GetType();
+                var _props = _typeLic.GetProperties();
 
                 object _value = null;
-                string _formatedValue = string.Empty;
-                foreach (PropertyInfo _p in _props)
-                {
+                var _formatedValue = string.Empty;
+                foreach (var _p in _props)
                     try
                     {
-                        ShowInLicenseInfoAttribute _showAttr = (ShowInLicenseInfoAttribute)Attribute.GetCustomAttribute(_p, typeof(ShowInLicenseInfoAttribute));
+                        var _showAttr =
+                            (ShowInLicenseInfoAttribute) Attribute.GetCustomAttribute(_p,
+                                typeof(ShowInLicenseInfoAttribute));
                         if (_showAttr != null && _showAttr.ShowInLicenseInfo)
                         {
                             _value = _p.GetValue(license, null);
@@ -59,31 +59,26 @@ namespace QLicense.Windows.Controls
                                         _formatedValue = _value.ToString();
                                         break;
                                     case ShowInLicenseInfoAttribute.FormatType.Date:
-                                        if (_p.PropertyType == typeof(DateTime) && !string.IsNullOrWhiteSpace(DateFormat))
-                                        {
-                                            _formatedValue = ((DateTime)_value).ToString(DateFormat);
-                                        }
+                                        if (_p.PropertyType == typeof(DateTime) &&
+                                            !string.IsNullOrWhiteSpace(DateFormat))
+                                            _formatedValue = ((DateTime) _value).ToString(DateFormat);
                                         else
-                                        {
                                             _formatedValue = _value.ToString();
-                                        }
                                         break;
                                     case ShowInLicenseInfoAttribute.FormatType.DateTime:
-                                        if (_p.PropertyType == typeof(DateTime) && !string.IsNullOrWhiteSpace(DateTimeFormat))
-                                        {
-                                            _formatedValue = ((DateTime)_value).ToString(DateTimeFormat);
-                                        }
+                                        if (_p.PropertyType == typeof(DateTime) &&
+                                            !string.IsNullOrWhiteSpace(DateTimeFormat))
+                                            _formatedValue = ((DateTime) _value).ToString(DateTimeFormat);
                                         else
-                                        {
                                             _formatedValue = _value.ToString();
-                                        }
                                         break;
                                     case ShowInLicenseInfoAttribute.FormatType.EnumDescription:
-                                        string _name = Enum.GetName(_p.PropertyType, _value);
+                                        var _name = Enum.GetName(_p.PropertyType, _value);
                                         if (_name != null)
                                         {
-                                            FieldInfo _fi = _p.PropertyType.GetField(_name);
-                                            DescriptionAttribute _dna = (DescriptionAttribute)Attribute.GetCustomAttribute(_fi, typeof(DescriptionAttribute));
+                                            var _fi = _p.PropertyType.GetField(_name);
+                                            var _dna = (DescriptionAttribute) Attribute.GetCustomAttribute(_fi,
+                                                typeof(DescriptionAttribute));
                                             if (_dna != null)
                                                 _formatedValue = _dna.Description;
                                             else
@@ -93,6 +88,7 @@ namespace QLicense.Windows.Controls
                                         {
                                             _formatedValue = _value.ToString();
                                         }
+
                                         break;
                                 }
 
@@ -106,13 +102,9 @@ namespace QLicense.Windows.Controls
                     {
                         //Ignore exeption
                     }
-                }
 
 
-                if (string.IsNullOrWhiteSpace(additionalInfo))
-                {
-                    _sb.Append(additionalInfo.Trim());
-                }
+                if (string.IsNullOrWhiteSpace(additionalInfo)) _sb.Append(additionalInfo.Trim());
 
                 txtLicInfo.Text = _sb.ToString();
             }

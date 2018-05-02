@@ -5,6 +5,13 @@ namespace QLicense.Windows.Controls
 {
     public partial class LicenseActivateControl : UserControl
     {
+        public LicenseActivateControl()
+        {
+            InitializeComponent();
+
+            ShowMessageAfterValidation = true;
+        }
+
         public string AppName { get; set; }
 
         public byte[] CertificatePublicKeyData { private get; set; }
@@ -13,24 +20,11 @@ namespace QLicense.Windows.Controls
 
         public Type LicenseObjectType { get; set; }
 
-        public string LicenseBASE64String
-        {
-            get
-            {
-                return txtLicense.Text.Trim();
-            }
-        }
-
-        public LicenseActivateControl()
-        {
-            InitializeComponent();
-
-            ShowMessageAfterValidation = true;
-        }
+        public string LicenseBASE64String => txtLicense.Text.Trim();
 
         public void ShowUID()
         {
-            txtUID.Text = LicenseHandler.GenerateUID(AppName);
+            txtUID.Text = LicenseHandler.GenerateUid(AppName);
         }
 
         public bool ValidateLicense()
@@ -42,28 +36,33 @@ namespace QLicense.Windows.Controls
             }
 
             //Check the activation string
-            LicenseStatus _licStatus= LicenseStatus.UNDEFINED;
-            string _msg = string.Empty;
-            LicenseEntity _lic = LicenseHandler.ParseLicenseFromBASE64String(LicenseObjectType, txtLicense.Text.Trim(), CertificatePublicKeyData, out _licStatus, out _msg);
-            switch (_licStatus)
+            var licStatus = LicenseStatus.Undefined;
+            var msg = string.Empty;
+            var lic = LicenseHandler.ParseLicenseFromBase64String(LicenseObjectType, txtLicense.Text.Trim(),
+                CertificatePublicKeyData, out licStatus, out msg);
+            switch (licStatus)
             {
-                case LicenseStatus.VALID:                   
+                case LicenseStatus.Valid:
+                {
                     if (ShowMessageAfterValidation)
                     {
-                        MessageBox.Show(_msg, "License is valid", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show(msg, "License is valid", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                     return true;
-                    
-                case LicenseStatus.CRACKED:
-                case LicenseStatus.INVALID:
-                case LicenseStatus.UNDEFINED:
+                }
+
+                case LicenseStatus.Cracked:
+                case LicenseStatus.Invalid:
+                case LicenseStatus.Undefined:
+                {
                     if (ShowMessageAfterValidation)
                     {
-                        MessageBox.Show(_msg, "License is INVALID", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(msg, "License is INVALID", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
                     return false;
+                }
 
                 default:
                     return false;

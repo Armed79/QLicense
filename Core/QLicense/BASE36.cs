@@ -3,45 +3,51 @@ using System.Text;
 
 namespace QLicense
 {
-    class BASE36
+    internal class Base36
     {
-        private const string _charList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private static readonly char[] _charArray = _charList.ToCharArray();
+        private const string charList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private static readonly char[] charArray = charList.ToCharArray();
 
         public static long Decode(string input)
         {
-            long _result = 0;
-            double _pow = 0;
-            for (int _i = input.Length - 1; _i >= 0; _i--)
+            long result = 0;
+            double pow = 0;
+            for (int i = input.Length - 1; i >= 0; i--)
             {
-                char _c = input[_i];
-                int pos = _charList.IndexOf(_c);
+                char c = input[i];
+                int pos = charList.IndexOf(c);
                 if (pos > -1)
-                    _result += pos * (long)Math.Pow(_charList.Length, _pow);
+                {
+                    result += pos * (long) Math.Pow(charList.Length, pow);
+                }
                 else
+                {
                     return -1;
-                _pow++;
+                }
+
+                pow++;
             }
-            return _result;
+
+            return result;
         }
 
         public static string Encode(ulong input)
         {
-            StringBuilder _sb = new StringBuilder();
+            var sb = new StringBuilder();
             do
             {
-                _sb.Append(_charArray[input % (ulong)_charList.Length]);
-                input /= (ulong)_charList.Length;
+                sb.Append(charArray[input % (ulong) charList.Length]);
+                input /= (ulong) charList.Length;
             } while (input != 0);
 
-            return Reverse(_sb.ToString());
+            return Reverse(sb.ToString());
         }
 
         private static string Reverse(string s)
         {
-            var charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
+            char[] revCharArray = s.ToCharArray();
+            Array.Reverse(revCharArray);
+            return new string(revCharArray);
         }
     }
 }

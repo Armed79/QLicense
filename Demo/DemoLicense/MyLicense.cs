@@ -1,62 +1,63 @@
-﻿using QLicense;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Xml.Serialization;
+using QLicense;
 
 namespace DemoLicense
 {
-    public class MyLicense : QLicense.LicenseEntity
+    public class MyLicense : LicenseEntity
     {
+        public MyLicense()
+        {
+            //Initialize app name for the license
+            AppName = "DemoWinFormApp";
+        }
+
         [DisplayName("Enable Feature 01")]
-        [Category("License Options")]        
+        [Category("License Options")]
         [XmlElement("EnableFeature01")]
         [ShowInLicenseInfo(true, "Enable Feature 01", ShowInLicenseInfoAttribute.FormatType.String)]
         public bool EnableFeature01 { get; set; }
 
         [DisplayName("Enable Feature 02")]
-        [Category("License Options")]        
+        [Category("License Options")]
         [XmlElement("EnableFeature02")]
         [ShowInLicenseInfo(true, "Enable Feature 02", ShowInLicenseInfoAttribute.FormatType.String)]
         public bool EnableFeature02 { get; set; }
 
 
         [DisplayName("Enable Feature 03")]
-        [Category("License Options")]        
+        [Category("License Options")]
         [XmlElement("EnableFeature03")]
         [ShowInLicenseInfo(true, "Enable Feature 03", ShowInLicenseInfoAttribute.FormatType.String)]
         public bool EnableFeature03 { get; set; }
 
-        public MyLicense()
-        {
-            //Initialize app name for the license
-            this.AppName = "DemoWinFormApp";
-        }
-
         public override LicenseStatus DoExtraValidation(out string validationMsg)
         {
-            LicenseStatus _licStatus = LicenseStatus.UNDEFINED;
+            var _licStatus = LicenseStatus.Undefined;
             validationMsg = string.Empty;
 
-            switch (this.Type)
+            switch (Type)
             {
                 case LicenseTypes.Single:
                     //For Single License, check whether UID is matched
-                    if (this.UID == LicenseHandler.GenerateUID(this.AppName))
+                    if (UID == LicenseHandler.GenerateUid(AppName))
                     {
-                        _licStatus = LicenseStatus.VALID;
+                        _licStatus = LicenseStatus.Valid;
                     }
                     else
                     {
                         validationMsg = "The license is NOT for this copy!";
-                        _licStatus = LicenseStatus.INVALID;                    
+                        _licStatus = LicenseStatus.Invalid;
                     }
+
                     break;
                 case LicenseTypes.Volume:
                     //No UID checking for Volume License
-                    _licStatus = LicenseStatus.VALID;
+                    _licStatus = LicenseStatus.Valid;
                     break;
                 default:
                     validationMsg = "Invalid license";
-                    _licStatus= LicenseStatus.INVALID;
+                    _licStatus = LicenseStatus.Invalid;
                     break;
             }
 

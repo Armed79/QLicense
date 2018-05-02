@@ -5,15 +5,17 @@ using System.Windows.Forms;
 namespace QLicense.Windows.Controls
 {
     public delegate void LicenseSettingsValidatingHandler(object sender, LicenseSettingsValidatingEventArgs e);
+
     public delegate void LicenseGeneratedHandler(object sender, LicenseGeneratedEventArgs e);
 
     public partial class LicenseSettingsControl : UserControl
     {
-
-        public event LicenseSettingsValidatingHandler OnLicenseSettingsValidating;
-        public event LicenseGeneratedHandler OnLicenseGenerated;
-
         protected LicenseEntity _lic;
+
+        public LicenseSettingsControl()
+        {
+            InitializeComponent();
+        }
 
         public LicenseEntity License
         {
@@ -30,25 +32,17 @@ namespace QLicense.Windows.Controls
 
         public bool AllowVolumeLicense
         {
-            get
-            {
-                return grpbxLicenseType.Enabled;
-            }
+            get => grpbxLicenseType.Enabled;
             set
             {
-                if (!value)
-                {
-                    rdoSingleLicense.Checked = true;
-                }
+                if (!value) rdoSingleLicense.Checked = true;
 
                 grpbxLicenseType.Enabled = value;
             }
         }
 
-        public LicenseSettingsControl()
-        {
-            InitializeComponent();
-        }
+        public event LicenseSettingsValidatingHandler OnLicenseSettingsValidating;
+        public event LicenseGeneratedHandler OnLicenseGenerated;
 
 
         private void LicenseTypeRadioButtons_CheckedChanged(object sender, EventArgs e)
@@ -64,14 +58,15 @@ namespace QLicense.Windows.Controls
 
             if (rdoSingleLicense.Checked)
             {
-                if (LicenseHandler.ValidateUIDFormat(txtUID.Text.Trim()))
+                if (LicenseHandler.ValidateUidFormat(txtUID.Text.Trim()))
                 {
                     _lic.Type = LicenseTypes.Single;
                     _lic.UID = txtUID.Text.Trim();
                 }
                 else
                 {
-                    MessageBox.Show("License UID is blank or invalid", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("License UID is blank or invalid", string.Empty, MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
                     return;
                 }
             }
@@ -85,21 +80,19 @@ namespace QLicense.Windows.Controls
 
             if (OnLicenseSettingsValidating != null)
             {
-                LicenseSettingsValidatingEventArgs _args = new LicenseSettingsValidatingEventArgs() { License = _lic, CancelGenerating = false };
+                var _args = new LicenseSettingsValidatingEventArgs {License = _lic, CancelGenerating = false};
 
                 OnLicenseSettingsValidating(this, _args);
 
-                if (_args.CancelGenerating)
-                {
-                    return;
-                }
+                if (_args.CancelGenerating) return;
             }
 
             if (OnLicenseGenerated != null)
             {
-                string _licStr = LicenseHandler.GenerateLicenseBASE64String(_lic, CertificatePrivateKeyData, CertificatePassword);
+                var _licStr =
+                    LicenseHandler.GenerateLicenseBase64String(_lic, CertificatePrivateKeyData, CertificatePassword);
 
-                OnLicenseGenerated(this, new LicenseGeneratedEventArgs() { LicenseBASE64String = _licStr });
+                OnLicenseGenerated(this, new LicenseGeneratedEventArgs {LicenseBASE64String = _licStr});
             }
         }
     }
